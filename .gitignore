@@ -1,0 +1,6 @@
+# dwm
+dwm/*.o
+dwm/dwm
+
+# dwmblocks
+dwmblocks/dwmblocks
