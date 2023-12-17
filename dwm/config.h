@@ -34,6 +34,11 @@ static const char *colors[][3]      = {
 //static const char *tags[] = { "α", "β", "ɣ", "δ", "ε", "ζ", "η", "θ", "ι" };
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
+typedef struct {
+	const char *name;
+	const void *cmd;
+} Sp;
+
 static const Rule rules[] = {
 	/* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
@@ -104,11 +109,16 @@ static const char *dmenucmd[] = {
   "/home/rohanj/.config/rofi/bin/launcher_colorful"
 };
 static const char scratchpadname[] = "scratchpad";
-static const char *scratchpadcmd[] = { "kitty", "-t", scratchpadname, "-g", "120x34", NULL };
+const char *spcmd1[] = { "kitty", "-T", scratchpadname, NULL };
+
+static Sp scratchpads[] = {
+	/* name          cmd  */
+	{"spterm",      spcmd1},
+};
 
 static const char *termcmd[]  = { "kitty", NULL };
 static const char *brwsrcmd1[]  = { "firefox", NULL };
-static const char *filemgr[]  = { "thunar", NULL };
+static const char *filemgr[]  = { "nautilus", NULL };
 
 // static const char *upvol[] = {"/usr/bin/pactl", "set-sink-volume", "0", "+5%", NULL};//  , "kill", "-44", "$(", "pidof", "dwmblocks", ")", NULL};
 // static const char *downvol[] = {"/usr/bin/pactl", "set-sink-volume", "0", "-5%", NULL};//, "kill", "-44", "$(", "pidof", "dwmblocks", ")", NULL};
@@ -127,6 +137,7 @@ static const char *ss[] = {"/usr/bin/flameshot", "gui", NULL};
 static const char *emoji[] = {"/home/rohanj/.config/rofi/bin/launcher_colorful_emoji", NULL};
 static const char *win[] = {"/home/rohanj/.config/rofi/bin/launcher_colorful_win", NULL};
 static const char *calc[] = {"galculator", NULL};
+static const char *neovide[] = {"neovide", NULL};
 
 static const Key keys[] = {
 	/* modifier                     key            function                argument */
@@ -143,24 +154,34 @@ static const Key keys[] = {
  	{ MODKEY|ShiftMask,             XK_s,          spawn,                  {.v = ss } },
  	{ MODKEY|ShiftMask,             XK_e,          spawn,                  {.v = emoji } },
 	{ OTHERMODKEY,                  XK_Tab,        spawn,                  {.v = win } },
+	{ MODKEY,                       XK_n,          spawn,              {.v = neovide} },
 	{ MODKEY,                       XK_b,          togglebar,              {0} },
 	{ MODKEY,                       XK_j,          focusstack,             {.i = +1 } },
 	{ MODKEY,                       XK_k,          focusstack,             {.i = -1 } },
-	{ MODKEY,                       XK_Tab,          focusstack,             {.i = +1 } },
+	{ MODKEY,                       XK_Tab,        focusstack,             {.i = +1 } },
   { MODKEY|ShiftMask,             XK_j,          rotatestack,            {.i = +1 } },
  	{ MODKEY|ShiftMask,             XK_k,          rotatestack,            {.i = -1 } },
 	{ MODKEY,                       XK_Up,         incnmaster,             {.i = +1 } },
 	{ MODKEY,                       XK_Down,       incnmaster,             {.i = -1 } },
 	{ MODKEY,                       XK_h,          setmfact,               {.f = -0.05} },
 	{ MODKEY,                       XK_l,          setmfact,               {.f = +0.05} },
-	{ MODKEY|ShiftMask,             XK_Return,     zoom,                   {0} },
+	{ MODKEY|ShiftMask,             XK_Return,     togglescratch,          {.ui = 0} },
 	{ MODKEY,                       XK_q,          killclient,             {0} },
 	{ MODKEY|ShiftMask,             XK_q,          quit,                   {0} },
   { MODKEY|ShiftMask,             XK_r,          quit,                   {1} },
-	{ MODKEY,                       XK_t,          setlayout,              {.v = &layouts[0]} },
-	{ MODKEY,                       XK_f,          setlayout,              {.v = &layouts[5]} },
-	{ MODKEY,                       XK_m,          setlayout,              {.v = &layouts[2]} },
-	{ MODKEY,                       XK_space,      setlayout,              {0} },
+	{ MODKEY,                       XK_t,          setlayout,              {.v = &layouts[0]} }, // Tile
+	{ MODKEY|ShiftMask,             XK_t,          setlayout,              {.v = &layouts[1]} }, // bstack
+	{ MODKEY,                       XK_y,          setlayout,              {.v = &layouts[8]} }, // deck
+	{ MODKEY|ShiftMask,             XK_y,          setlayout,              {.v = &layouts[9]} }, // grid
+	{ MODKEY,                       XK_u,          setlayout,              {.v = &layouts[2]} }, // bstackhoriz
+	{ MODKEY|ShiftMask,             XK_u,          setlayout,              {.v = &layouts[12]} }, // gaplessgrid
+	{ MODKEY,                       XK_i,          setlayout,              {.v = &layouts[3]} }, // centeredmaster
+	{ MODKEY|ShiftMask,             XK_i,          setlayout,              {.v = &layouts[4]} }, // centeredfloatingmaster
+	{ MODKEY,                       XK_o,          setlayout,              {.v = &layouts[10]} }, // nrowgrid
+	{ MODKEY|ShiftMask,             XK_o,          setlayout,              {.v = &layouts[11]} }, // horizgrid
+	{ MODKEY,                       XK_f,          setlayout,              {.v = &layouts[5]} }, // fullscreen/monocle
+  { MODKEY|ShiftMask,             XK_f,          setlayout,              {.v = &layouts[13]} }, // floating
+  { MODKEY,                       XK_space,      zoom,                   {0} },
 	{ MODKEY|ShiftMask,             XK_t,          togglefloating,         {0} },
 	{ MODKEY,                       XK_0,          view,                   {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,          tag,                    {.ui = ~0 } },

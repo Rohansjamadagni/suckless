@@ -64,6 +64,7 @@
 #define BARRULES                20
 #define WTYPE                   "_NET_WM_WINDOW_TYPE_"
 #define TAGMASK                 ((1 << NUMTAGS) - 1)
+#define SPTAG(i)		((1 << LENGTH(tags)) << (i))
 #define TEXTWM(X)               (drw_fontset_getwidth(drw, (X), True) + lrpad)
 #define HIDDEN(C)               ((getstate(C->win) == IconicState))
 
@@ -2280,23 +2281,27 @@ togglefloating(const Arg *arg)
 void
 togglescratch(const Arg *arg)
 {
-	Client *c;
-	unsigned int found = 0;
+  Client *c;
+  unsigned int found = 0;
+  unsigned int scratchtag = SPTAG(arg->ui);
+  Arg sparg = {.v = scratchpads[arg->ui].cmd};
 
-	for (c = selmon->clients; c && !(found = c->tags & scratchtag); c = c->next);
-	if (found) {
-		unsigned int newtagset = selmon->tagset[selmon->seltags] ^ scratchtag;
-		if (newtagset) {
-			selmon->tagset[selmon->seltags] = newtagset;
-			focus(NULL);
-			arrange(selmon);
-		}
-		if (ISVISIBLE(c)) {
-			focus(c);
-			restack(selmon);
-		}
-	} else
-		spawn(arg);
+  for (c = selmon->clients; c && !(found = c->tags & scratchtag); c = c->next);
+  if (found) {
+    unsigned int newtagset = selmon->tagset[selmon->seltags] ^ scratchtag;
+    if (newtagset) {
+      selmon->tagset[selmon->seltags] = newtagset;
+      focus(NULL);
+      arrange(selmon);
+    }
+    if (ISVISIBLE(c)) {
+      focus(c);
+      restack(selmon);
+    }
+  } else {
+    selmon->tagset[selmon->seltags] |= scratchtag;
+    spawn(&sparg);
+  }
 }
 
 void
